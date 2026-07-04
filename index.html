@@ -226,7 +226,7 @@
     <div class="frage">
       <div class="frage-top">
         <div class="frage-nr">Frage 1</div>
-        <div class="frage-text">Welche Abteilungen sind bei euch im aktiven Spielbetrieb?</div>
+        <div class="frage-text">In welchen Bereichen habt ihr Mannschaften die am Spielbetrieb teilnehmen?</div>
         <div class="frage-sub">Mehrfachauswahl</div>
       </div>
       <div class="frage-body">
@@ -268,20 +268,20 @@
       <div class="frage-top">
         <div class="frage-nr">Frage 3</div>
         <div class="frage-text">Was kostet euch in der internen Organisation am meisten Zeit und Nerven?</div>
-        <div class="frage-sub">Mehrfachauswahl – bis zu 3 auswählen</div>
+        <div class="frage-sub">Mehrfachauswahl – bis zu 4 auswählen</div>
       </div>
       <div class="frage-body">
         <div class="max-hint" id="q3h"></div>
         <div class="opts" id="q3">
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Verfügbarkeiten abfragen"><span class="dot sq"></span>Verfügbarkeiten der Spieler abfragen und nachfassen</label>
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Kurzfristige Ausfälle"><span class="dot sq"></span>Kurzfristige Ausfälle und Ersatzsuche am Spieltag</label>
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Spielverschiebungen"><span class="dot sq"></span>Spielverschiebungen koordinieren</label>
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Kommunikation SBL/MF"><span class="dot sq"></span>Kommunikation SBL und Mannschaftsführer</label>
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Kommunikation Spieler"><span class="dot sq"></span>Kommunikation mit den Spielern</label>
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Aufstellungen planen"><span class="dot sq"></span>Aufstellungen planen und mitteilen</label>
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Saisonplanung"><span class="dot sq"></span>Saisonplanung – wer spielt in welcher Mannschaft</label>
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Hallenzeiten/Training"><span class="dot sq"></span>Hallenzeiten und Trainingsplanung</label>
-          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Jugendkoordination"><span class="dot sq"></span>Jugendkoordination – Spieler, Eltern, Termine</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Verfügbarkeiten abfragen"><span class="dot sq"></span>Verfügbarkeiten der Spieler abfragen und nachfassen</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Kurzfristige Ausfälle"><span class="dot sq"></span>Kurzfristige Ausfälle und Ersatzsuche am Spieltag</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Spielverschiebungen"><span class="dot sq"></span>Spielverschiebungen koordinieren</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Kommunikation SBL/MF"><span class="dot sq"></span>Kommunikation SBL und Mannschaftsführer</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Kommunikation Spieler"><span class="dot sq"></span>Kommunikation mit den Spielern</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Aufstellungen planen"><span class="dot sq"></span>Aufstellungen planen und mitteilen</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Saisonplanung"><span class="dot sq"></span>Saisonplanung – wer spielt in welcher Mannschaft</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Hallenzeiten/Training"><span class="dot sq"></span>Hallenzeiten und Trainingsplanung</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',4)"><input type="checkbox" value="Jugendkoordination"><span class="dot sq"></span>Jugendkoordination – Spieler, Eltern, Termine</label>
         </div>
       </div>
     </div>
@@ -297,9 +297,11 @@
           <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="WhatsApp"><span class="dot sq"></span>WhatsApp-Gruppen</label>
           <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="Telefon/SMS"><span class="dot sq"></span>Telefon / SMS</label>
           <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="E-Mail"><span class="dot sq"></span>E-Mail</label>
-          <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="Vereinseigene App"><span class="dot sq"></span>Vereinseigene App oder Plattform</label>
           <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="Aushang"><span class="dot sq"></span>Aushang / Schwarzes Brett</label>
-          <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="click-tt/mytischtennis"><span class="dot sq"></span>click-tt / mytischtennis.de</label>
+          <label class="opt" id="app-label" onclick="chkApp(this)"><input type="checkbox" value="Vereinseigene App"><span class="dot sq"></span>Vereinseigene App oder Plattform</label>
+          <div id="app-detail" style="display:none;margin-top:8px">
+            <input type="text" id="app-name" placeholder="Welche App oder Plattform?" style="width:100%;padding:10px 13px;background:#F0F4F8;border:1.5px solid #E2E8F0;border-radius:8px;color:#1A2B3C;font-family:Calibri,sans-serif;font-size:14px;outline:none;transition:border-color 130ms" onfocus="this.style.borderColor='#1D9E75'" onblur="this.style.borderColor='#E2E8F0'">
+          </div>
         </div>
       </div>
     </div>
@@ -370,6 +372,24 @@
     </div>
   </div>
 
+  <!-- E-Mail opt-in -->
+  <div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;padding:18px 18px 16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:32px;height:32px;border-radius:8px;background:#1D9E75;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✉</div>
+      <div>
+        <div style="font-weight:700;color:#1A3A5C;font-size:15px">Ergebnisse erhalten?</div>
+        <div style="font-size:12px;color:#64748B">Freiwillig – kein Pflichtfeld</div>
+      </div>
+    </div>
+    <p style="font-size:13px;color:#64748B;margin-bottom:12px;line-height:1.6">
+      Wenn du die Auswertung nach Abschluss der Befragung erhalten möchtest, hinterlasse hier deine E-Mail. Das Feld ist freiwillig – wer es leer lässt bleibt vollständig anonym.
+    </p>
+    <input type="email" id="email-opt"
+      placeholder="deine@email.de (freiwillig)"
+      style="width:100%;padding:10px 13px;background:#F0F4F8;border:1.5px solid #E2E8F0;border-radius:8px;color:#1A2B3C;font-family:Calibri,sans-serif;font-size:14px;outline:none;transition:border-color 130ms"
+      onfocus="this.style.borderColor='#1D9E75'" onblur="this.style.borderColor='#E2E8F0'">
+  </div>
+
   <button class="btn-send" id="btn" onclick="senden()">Antworten absenden</button>
   <div id="err"></div>
 
@@ -423,6 +443,14 @@ function getRad(gid) {
   return el ? el.value : null;
 }
 
+function chkApp(el) {
+  const inp    = el.querySelector('input');
+  inp.checked  = !inp.checked;
+  el.classList.toggle('sel-teal', inp.checked);
+  document.getElementById('app-detail').style.display = inp.checked ? 'block' : 'none';
+  if (!inp.checked) document.getElementById('app-name').value = '';
+}
+
 async function senden() {
   const btn = document.getElementById('btn');
   btn.disabled = true; btn.textContent = 'Wird gespeichert...';
@@ -434,9 +462,11 @@ async function senden() {
     zeitfresser:            getChk('q3'),
     kommunikation:          getChk('q4'),
     whatsapp_freitext:      document.getElementById('q5').value.trim() || null,
+    app_name:               document.getElementById('app-name').value.trim() || null,
     mytischtennis_erlebnis: getRad('q6'),
     tt_wunsch:              document.getElementById('q7').value.trim() || null,
     eine_sache:             document.getElementById('q8').value.trim() || null,
+    email_opt:              document.getElementById('email-opt').value.trim() || null,
   });
 
   if (error) {
