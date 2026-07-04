@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vereinsbefragung Spielbetrieb 2026 · Bezirk Ostwürttemberg</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #F0F4F8;
+      --card:    #FFFFFF;
+      --card2:   #F7FAFC;
+      --navy:    #1A3A5C;
+      --navy2:   #234E7A;
+      --teal:    #1D9E75;
+      --teal2:   #E8F7F2;
+      --blue:    #2563EB;
+      --blue2:   #EFF6FF;
+      --purple:  #534AB7;
+      --purple2: #F0EFFD;
+      --orange:  #D4620A;
+      --orange2: #FFF3EC;
+      --text:    #1A2B3C;
+      --muted:   #64748B;
+      --border:  #E2E8F0;
+      --radius:  10px;
+    }
+    body {
+      font-family: Calibri,'Segoe UI',system-ui,sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+      color: #fff;
+      padding: 52px 24px 44px;
+      text-align: center;
+    }
+    .hero-kicker {
+      font-size: 12px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.55);
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-family: 'Bahnschrift SemiBold','Segoe UI Semibold',sans-serif;
+      font-size: clamp(22px, 5vw, 36px);
+      font-weight: 700; margin-bottom: 12px; line-height: 1.2;
+    }
+    .hero p {
+      color: rgba(255,255,255,0.7); max-width: 520px;
+      margin: 0 auto 20px; font-size: 15px;
+    }
+    .badges { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+    .badge {
+      padding: 4px 12px; border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 12px; color: rgba(255,255,255,0.65);
+    }
+    .badge.hi { border-color: rgba(29,158,117,0.6); color: #6FD8B8; }
+
+    /* Layout */
+    .wrap { max-width: 660px; margin: 36px auto; padding: 0 18px 60px; }
+
+    /* Info-Box */
+    .info-box {
+      background: var(--teal2);
+      border: 1px solid rgba(29,158,117,0.25);
+      border-left: 4px solid var(--teal);
+      border-radius: var(--radius);
+      padding: 16px 18px; margin-bottom: 32px;
+    }
+    .info-box strong { color: var(--teal); font-size: 14px; display:block; margin-bottom:6px; }
+    .info-box p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* Sektion */
+    .section { margin-bottom: 32px; }
+    .section-head {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px; padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-badge {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bahnschrift SemiBold',sans-serif;
+      font-size: 15px; color: #fff; flex-shrink: 0;
+    }
+    .section-name {
+      font-family: 'Bahnschrift SemiBold',sans-serif;
+      font-size: 16px; color: var(--navy); font-weight: 700;
+    }
+
+    /* Frage */
+    .frage {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .frage-top {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card2);
+    }
+    .frage-nr { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+    .frage-text { font-size: 15px; font-weight: 700; color: var(--navy); line-height: 1.4; }
+    .frage-sub { font-size: 12px; color: var(--muted); margin-top: 3px; font-style: italic; }
+    .frage-body { padding: 14px 16px; }
+
+    /* Optionen */
+    .opts { display: grid; gap: 7px; }
+    .opt {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 130ms, background 130ms;
+      font-size: 14px; color: var(--text);
+      user-select: none;
+    }
+    .opt:hover { border-color: #94A3B8; background: #EDF2F7; }
+    .opt input { display: none; }
+    .dot {
+      width: 17px; height: 17px; border-radius: 50%;
+      border: 2px solid #CBD5E1; flex-shrink: 0;
+      transition: all 130ms; background: #fff;
+    }
+    .dot.sq { border-radius: 4px; }
+
+    .opt.sel-teal   { border-color: var(--teal);   background: var(--teal2); }
+    .opt.sel-teal   .dot { border-color: var(--teal);   background: var(--teal); }
+    .opt.sel-blue   { border-color: var(--blue);   background: var(--blue2); }
+    .opt.sel-blue   .dot { border-color: var(--blue);   background: var(--blue); }
+    .opt.sel-purple { border-color: var(--purple);  background: var(--purple2); }
+    .opt.sel-purple .dot { border-color: var(--purple);  background: var(--purple); }
+    .opt.sel-orange { border-color: var(--orange);  background: var(--orange2); }
+    .opt.sel-orange .dot { border-color: var(--orange);  background: var(--orange); }
+
+    .max-hint { font-size: 12px; color: var(--orange); margin-bottom:8px; font-weight:700; min-height:16px; }
+
+    /* Freitext */
+    textarea {
+      width: 100%; padding: 11px 13px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: Calibri,sans-serif; font-size: 14px;
+      outline: none; resize: vertical; min-height: 90px;
+      transition: border-color 130ms;
+    }
+    textarea:focus { border-color: var(--teal); background: #fff; }
+    textarea::placeholder { color: #A0AEC0; }
+
+    /* Submit */
+    .btn-send {
+      width: 100%; padding: 15px;
+      background: var(--teal); color: #fff; border: none;
+      border-radius: var(--radius);
+      font-family: 'Bahnschrift SemiBold',Calibri,sans-serif;
+      font-size: 16px; cursor: pointer;
+      transition: opacity 150ms; margin-top: 6px;
+      box-shadow: 0 2px 6px rgba(29,158,117,0.3);
+    }
+    .btn-send:hover:not(:disabled) { opacity: 0.88; }
+    .btn-send:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+    /* Erfolg */
+    .success {
+      text-align: center; padding: 60px 24px;
+      background: var(--card); border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .ok-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--teal2); border: 2px solid var(--teal);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px; font-size: 28px; color: var(--teal);
+    }
+    .success h2 { font-family:'Bahnschrift SemiBold',sans-serif; font-size:22px; color:var(--navy); margin-bottom:10px; }
+    .success p  { color: var(--muted); font-size: 14px; line-height: 1.8; }
+
+    .err { background:#FEF2F2; border:1px solid #FECACA; border-radius:8px; padding:12px 14px; font-size:13px; color:#B91C1C; margin-top:12px; }
+
+    .footer { text-align:center; margin-top:36px; font-size:13px; color:var(--muted); line-height:1.8; }
+    .footer a { color: var(--teal); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-kicker">Bezirk Ostwürttemberg · Tischtennis · 2026</div>
+  <h1>Vereinsbefragung Spielbetrieb</h1>
+  <p>Organisation, Kommunikation, Alltag – was läuft gut, was nervt, was wünscht ihr euch?</p>
+  <div class="badges">
+    <span class="badge hi">Anonym</span>
+    <span class="badge">ca. 3 Minuten</span>
+    <span class="badge">kein Login erforderlich</span>
+  </div>
+</div>
+
+<div class="wrap" id="wrap">
+
+  <div class="info-box">
+    <strong>Warum diese Befragung?</strong>
+    <p>Als Spielbetriebsleiter bei FC Strass e.V. beschäftige ich mich damit, wie der Vereinsalltag im Tischtennis einfacher werden kann. Mich interessiert was in eurer täglichen Organisation wirklich Zeit kostet – jenseits von Spielplan und Tabelle.<br>
+    <em>Keine Werbung – nur ein ehrliches Bild aus dem Bezirk.</em></p>
+  </div>
+
+  <!-- A -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-badge" style="background:var(--blue)">A</div>
+      <div class="section-name">Euer Verein</div>
+    </div>
+
+    <div class="frage">
+      <div class="frage-top">
+        <div class="frage-nr">Frage 1</div>
+        <div class="frage-text">Welche Abteilungen sind bei euch im aktiven Spielbetrieb?</div>
+        <div class="frage-sub">Mehrfachauswahl</div>
+      </div>
+      <div class="frage-body">
+        <div class="opts" id="q1">
+          <label class="opt" onclick="chk(this,'blue')"><input type="checkbox" value="Erwachsene / Herren"><span class="dot sq"></span>Erwachsene / Herren</label>
+          <label class="opt" onclick="chk(this,'blue')"><input type="checkbox" value="Damen"><span class="dot sq"></span>Damen</label>
+          <label class="opt" onclick="chk(this,'blue')"><input type="checkbox" value="Jugend (Jungen)"><span class="dot sq"></span>Jugend (Jungen)</label>
+          <label class="opt" onclick="chk(this,'blue')"><input type="checkbox" value="Jugend (Mädchen)"><span class="dot sq"></span>Jugend (Mädchen)</label>
+          <label class="opt" onclick="chk(this,'blue')"><input type="checkbox" value="Senioren"><span class="dot sq"></span>Senioren</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="frage">
+      <div class="frage-top">
+        <div class="frage-nr">Frage 2</div>
+        <div class="frage-text">Wie viele Mannschaften habt ihr insgesamt im aktiven Spielbetrieb?</div>
+        <div class="frage-sub">Einfachauswahl</div>
+      </div>
+      <div class="frage-body">
+        <div class="opts" id="q2">
+          <label class="opt" onclick="radio(this,'blue','q2')"><input type="radio" value="1–2"><span class="dot"></span>1–2 Mannschaften</label>
+          <label class="opt" onclick="radio(this,'blue','q2')"><input type="radio" value="3–5"><span class="dot"></span>3–5 Mannschaften</label>
+          <label class="opt" onclick="radio(this,'blue','q2')"><input type="radio" value="6–9"><span class="dot"></span>6–9 Mannschaften</label>
+          <label class="opt" onclick="radio(this,'blue','q2')"><input type="radio" value="10+"><span class="dot"></span>10 oder mehr</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-badge" style="background:var(--teal)">B</div>
+      <div class="section-name">Interne Organisation</div>
+    </div>
+
+    <div class="frage">
+      <div class="frage-top">
+        <div class="frage-nr">Frage 3</div>
+        <div class="frage-text">Was kostet euch in der internen Organisation am meisten Zeit und Nerven?</div>
+        <div class="frage-sub">Mehrfachauswahl – bis zu 3 auswählen</div>
+      </div>
+      <div class="frage-body">
+        <div class="max-hint" id="q3h"></div>
+        <div class="opts" id="q3">
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Verfügbarkeiten abfragen"><span class="dot sq"></span>Verfügbarkeiten der Spieler abfragen und nachfassen</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Kurzfristige Ausfälle"><span class="dot sq"></span>Kurzfristige Ausfälle und Ersatzsuche am Spieltag</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Spielverschiebungen"><span class="dot sq"></span>Spielverschiebungen koordinieren</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Kommunikation SBL/MF"><span class="dot sq"></span>Kommunikation SBL und Mannschaftsführer</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Kommunikation Spieler"><span class="dot sq"></span>Kommunikation mit den Spielern</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Aufstellungen planen"><span class="dot sq"></span>Aufstellungen planen und mitteilen</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Saisonplanung"><span class="dot sq"></span>Saisonplanung – wer spielt in welcher Mannschaft</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Hallenzeiten/Training"><span class="dot sq"></span>Hallenzeiten und Trainingsplanung</label>
+          <label class="opt" onclick="chkMax(this,'teal','q3',3)"><input type="checkbox" value="Jugendkoordination"><span class="dot sq"></span>Jugendkoordination – Spieler, Eltern, Termine</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="frage">
+      <div class="frage-top">
+        <div class="frage-nr">Frage 4</div>
+        <div class="frage-text">Über welche Kanäle läuft bei euch die Kommunikation im Spielbetrieb?</div>
+        <div class="frage-sub">Mehrfachauswahl</div>
+      </div>
+      <div class="frage-body">
+        <div class="opts" id="q4">
+          <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="WhatsApp"><span class="dot sq"></span>WhatsApp-Gruppen</label>
+          <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="Telefon/SMS"><span class="dot sq"></span>Telefon / SMS</label>
+          <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="E-Mail"><span class="dot sq"></span>E-Mail</label>
+          <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="Vereinseigene App"><span class="dot sq"></span>Vereinseigene App oder Plattform</label>
+          <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="Aushang"><span class="dot sq"></span>Aushang / Schwarzes Brett</label>
+          <label class="opt" onclick="chk(this,'teal')"><input type="checkbox" value="click-tt/mytischtennis"><span class="dot sq"></span>click-tt / mytischtennis.de</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="frage">
+      <div class="frage-top">
+        <div class="frage-nr">Frage 5</div>
+        <div class="frage-text">Was läuft bei euch über WhatsApp, obwohl ihr euch wünscht es wäre strukturierter?</div>
+        <div class="frage-sub">Freitext</div>
+      </div>
+      <div class="frage-body">
+        <textarea id="q5" placeholder="z.B. Verfügbarkeitsabfragen, Aufstellungen, kurzfristige Änderungen..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-badge" style="background:var(--purple)">C</div>
+      <div class="section-name">click-tt und mytischtennis.de</div>
+    </div>
+
+    <div class="frage">
+      <div class="frage-top">
+        <div class="frage-nr">Frage 6</div>
+        <div class="frage-text">Wie erlebt ihr mytischtennis.de an Spieltagen (Samstag/Sonntag)?</div>
+        <div class="frage-sub">Einfachauswahl</div>
+      </div>
+      <div class="frage-body">
+        <div class="opts" id="q6">
+          <label class="opt" onclick="radio(this,'purple','q6')"><input type="radio" value="Problemlos"><span class="dot"></span>Läuft problemlos</label>
+          <label class="opt" onclick="radio(this,'purple','q6')"><input type="radio" value="Manchmal langsam"><span class="dot"></span>Manchmal langsam oder nicht erreichbar</label>
+          <label class="opt" onclick="radio(this,'purple','q6')"><input type="radio" value="Regelmäßig Probleme"><span class="dot"></span>Regelmäßig Probleme – stockt, Fehler, nicht erreichbar</label>
+          <label class="opt" onclick="radio(this,'purple','q6')"><input type="radio" value="Schauen nicht rein"><span class="dot"></span>Wir schauen an Spieltagen nicht rein</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="frage">
+      <div class="frage-top">
+        <div class="frage-nr">Frage 7</div>
+        <div class="frage-text">Was wünscht ihr euch von click-tt oder mytischtennis.de, das es heute nicht gibt oder nicht gut funktioniert?</div>
+        <div class="frage-sub">Freitext</div>
+      </div>
+      <div class="frage-body">
+        <textarea id="q7" placeholder="Euer konkreter Wunsch..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- D -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-badge" style="background:var(--orange)">D</div>
+      <div class="section-name">Die eine Frage</div>
+    </div>
+
+    <div class="frage">
+      <div class="frage-top">
+        <div class="frage-nr">Frage 8</div>
+        <div class="frage-text">Wenn du morgen eine einzige Sache in eurer Vereinsorganisation lösen könntest – was wäre das?</div>
+        <div class="frage-sub">Freitext</div>
+      </div>
+      <div class="frage-body">
+        <textarea id="q8" placeholder="Die wichtigste Sache..." style="min-height:110px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-send" id="btn" onclick="senden()">Antworten absenden</button>
+  <div id="err"></div>
+
+  <div class="footer">
+    Alle Antworten sind anonym · Ergebnisse werden nach Auswertung geteilt<br>
+    <strong>Christian Aust</strong> ·
+    <a href="mailto:tischtennis.fcstrass@gmail.com">tischtennis.fcstrass@gmail.com</a>
+  </div>
+
+</div>
+
+<script>
+const sb = window.supabase.createClient(
+  'https://nwutgxjnverlvmkrpiep.supabase.co',
+  'sb_publishable_09tn0DY3wswcIVQ-mN1S8A_znKWQXaF'
+);
+
+function chk(el, col) {
+  const inp = el.querySelector('input');
+  inp.checked = !inp.checked;
+  el.classList.toggle('sel-' + col, inp.checked);
+}
+
+function chkMax(el, col, gid, max) {
+  const inp  = el.querySelector('input');
+  const hint = document.getElementById(gid + 'h');
+  const n    = document.querySelectorAll('#' + gid + ' input:checked').length;
+  if (!inp.checked && n >= max) {
+    hint.textContent = 'Maximal ' + max + ' Auswahlen möglich.';
+    return;
+  }
+  hint.textContent = '';
+  inp.checked = !inp.checked;
+  el.classList.toggle('sel-' + col, inp.checked);
+}
+
+function radio(el, col, gid) {
+  document.querySelectorAll('#' + gid + ' .opt').forEach(o => {
+    o.classList.remove('sel-teal','sel-blue','sel-purple','sel-orange');
+    o.querySelector('input').checked = false;
+  });
+  el.querySelector('input').checked = true;
+  el.classList.add('sel-' + col);
+}
+
+function getChk(gid) {
+  return [...document.querySelectorAll('#' + gid + ' input:checked')].map(i => i.value);
+}
+function getRad(gid) {
+  const el = document.querySelector('#' + gid + ' input:checked');
+  return el ? el.value : null;
+}
+
+async function senden() {
+  const btn = document.getElementById('btn');
+  btn.disabled = true; btn.textContent = 'Wird gespeichert...';
+  document.getElementById('err').innerHTML = '';
+
+  const { error } = await sb.from('vereinsbefragung').insert({
+    abteilungen:            getChk('q1'),
+    anzahl_mannschaften:    getRad('q2'),
+    zeitfresser:            getChk('q3'),
+    kommunikation:          getChk('q4'),
+    whatsapp_freitext:      document.getElementById('q5').value.trim() || null,
+    mytischtennis_erlebnis: getRad('q6'),
+    tt_wunsch:              document.getElementById('q7').value.trim() || null,
+    eine_sache:             document.getElementById('q8').value.trim() || null,
+  });
+
+  if (error) {
+    document.getElementById('err').innerHTML =
+      '<div class="err">Fehler: ' + error.message + '</div>';
+    btn.disabled = false; btn.textContent = 'Antworten absenden';
+    return;
+  }
+
+  document.getElementById('wrap').innerHTML = `
+    <div class="success">
+      <div class="ok-icon">✓</div>
+      <h2>Danke für eure Antworten!</h2>
+      <p>Eure Rückmeldung wurde gespeichert.<br>
+      Die Ergebnisse werden nach Auswertung an alle Teilnehmer kommuniziert.<br><br>
+      <strong>Christian Aust · tischtennis.fcstrass@gmail.com</strong></p>
+    </div>`;
+}
+</script>
+</body>
+</html>
