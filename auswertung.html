@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auswertung · Vereinsbefragung 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0D1B2A; --navy2:#152232; --navy3:#1E3048;
+      --orange:#D4620A; --orange2:#F07830;
+      --teal:#1D9E75; --purple:#534AB7;
+      --white:#F7F9FF; --muted:#8996B4;
+      --line:rgba(255,255,255,0.10); --radius:10px;
+    }
+    body {
+      font-family: Calibri,'Segoe UI',system-ui,sans-serif;
+      background: var(--navy); color: var(--white);
+      min-height: 100vh; font-size: 15px; line-height: 1.55;
+    }
+
+    /* Login */
+    .login-wrap {
+      min-height: 100vh; display: flex;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .login-card {
+      width: 100%; max-width: 380px;
+      background: var(--navy2); border: 1px solid var(--line);
+      border-radius: 16px; overflow: hidden;
+    }
+    .login-head {
+      background: var(--navy3); padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .login-head h1 {
+      font-family: 'Bahnschrift SemiBold',sans-serif;
+      font-size: 18px; color: var(--white);
+    }
+    .login-head p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .login-body { padding: 24px; }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--muted); margin-bottom: 7px;
+    }
+    .field input {
+      width: 100%; padding: 10px 13px;
+      background: var(--navy3); border: 1px solid var(--line);
+      border-radius: var(--radius); color: var(--white);
+      font-family: Calibri,sans-serif; font-size: 15px; outline: none;
+      transition: border-color 140ms;
+    }
+    .field input:focus { border-color: var(--teal); }
+    .btn-login {
+      width: 100%; padding: 12px;
+      background: var(--orange); color: #fff; border: none;
+      border-radius: var(--radius);
+      font-family: 'Bahnschrift SemiBold',Calibri,sans-serif;
+      font-size: 15px; cursor: pointer; transition: opacity 150ms;
+    }
+    .btn-login:hover { opacity: 0.88; }
+    .err-msg {
+      background: rgba(226,75,74,0.12); border: 1px solid rgba(226,75,74,0.3);
+      border-radius: 8px; padding: 10px 13px; font-size: 13px;
+      color: #F08080; margin-top: 12px;
+    }
+
+    /* Dashboard */
+    .header {
+      background: var(--navy2); border-bottom: 1px solid var(--line);
+      padding: 14px 24px; display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    .header-brand {
+      font-family: 'Bahnschrift SemiBold',sans-serif;
+      font-size: 17px; color: var(--orange2);
+    }
+    .header-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .btn-reload {
+      padding: 6px 14px; border-radius: 6px;
+      background: rgba(29,158,117,0.15); border: 1px solid rgba(29,158,117,0.35);
+      color: #4FD4A8; font-size: 12px; font-weight: 700;
+      cursor: pointer; font-family: Calibri,sans-serif;
+      transition: all 140ms;
+    }
+    .btn-reload:hover { background: rgba(29,158,117,0.28); }
+
+    .main { padding: 24px; max-width: 1000px; margin: 0 auto; }
+
+    /* Stat-Karten */
+    .stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 12px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--navy2); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 16px;
+    }
+    .stat-label {
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
+    }
+    .stat-value {
+      font-family: 'Bahnschrift SemiBold',sans-serif;
+      font-size: 32px; color: var(--white);
+    }
+    .stat-value.teal   { color: var(--teal); }
+    .stat-value.orange { color: var(--orange2); }
+
+    /* Frage-Block */
+    .frage-block {
+      background: var(--navy2); border: 1px solid var(--line);
+      border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
+    }
+    .frage-head {
+      background: var(--navy3); padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .frage-nr {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bahnschrift SemiBold',sans-serif;
+      font-size: 13px; color: var(--white); flex-shrink: 0;
+    }
+    .frage-title { font-size: 14px; font-weight: 700; color: var(--white); }
+    .frage-body { padding: 14px 16px; }
+
+    /* Balkendiagramm */
+    .bar-row {
+      display: grid; grid-template-columns: 180px 1fr 48px;
+      align-items: center; gap: 10px; margin-bottom: 8px;
+    }
+    .bar-label { font-size: 13px; color: var(--muted); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track {
+      height: 22px; background: var(--navy3);
+      border-radius: 4px; overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 4px;
+      transition: width 600ms ease;
+    }
+    .bar-count { font-size: 13px; font-weight: 700; color: var(--white); text-align: right; }
+
+    /* Freitext-Antworten */
+    .freitext-list { display: grid; gap: 8px; }
+    .freitext-item {
+      background: var(--navy3); border-radius: 8px;
+      padding: 10px 14px; font-size: 13px; color: var(--white);
+      border-left: 3px solid var(--teal);
+      line-height: 1.5;
+    }
+    .freitext-empty { font-size: 13px; color: var(--muted); font-style: italic; }
+
+    /* E-Mail Liste */
+    .email-item {
+      background: var(--navy3); border-radius: 8px;
+      padding: 8px 14px; font-size: 13px; color: var(--teal);
+      border-left: 3px solid var(--orange);
+    }
+
+    /* Sektion-Trenner */
+    .section-label {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin: 24px 0 10px;
+    }
+
+    .loading {
+      text-align: center; padding: 60px;
+      color: var(--muted); font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .bar-row { grid-template-columns: 120px 1fr 36px; }
+      .bar-label { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-wrap" id="login-wrap">
+  <div class="login-card">
+    <div class="login-head">
+      <h1>Auswertung · Vereinsbefragung 2026</h1>
+      <p>Zugang nur für Administratoren</p>
+    </div>
+    <div class="login-body">
+      <div class="field">
+        <label>Passwort</label>
+        <input type="password" id="pw" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter') login()">
+      </div>
+      <button class="btn-login" onclick="login()">Anmelden</button>
+      <div id="login-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard (versteckt bis Login) -->
+<div id="dashboard" style="display:none">
+  <div class="header">
+    <div>
+      <div class="header-brand">Auswertung · Vereinsbefragung Spielbetrieb 2026</div>
+      <div class="header-sub">Bezirk Ostwürttemberg · Live-Ansicht</div>
+    </div>
+    <button class="btn-reload" onclick="laden()">↻ Aktualisieren</button>
+  </div>
+
+  <div class="main">
+    <div id="inhalt">
+      <div class="loading">Lade Daten...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL  = 'https://nwutgxjnverlvmkrpiep.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_09tn0DY3wswcIVQ-mN1S8A_znKWQXaF';
+const PASSWORT      = 'TT-Auswertung2026!';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+function login() {
+  const pw = document.getElementById('pw').value;
+  if (pw !== PASSWORT) {
+    document.getElementById('login-err').innerHTML =
+      '<div class="err-msg">Falsches Passwort.</div>';
+    return;
+  }
+  document.getElementById('login-wrap').style.display = 'none';
+  document.getElementById('dashboard').style.display  = 'block';
+  laden();
+}
+
+async function laden() {
+  document.getElementById('inhalt').innerHTML =
+    '<div class="loading">Lade Daten...</div>';
+
+  const { data, error } = await sb
+    .from('vereinsbefragung')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error || !data) {
+    document.getElementById('inhalt').innerHTML =
+      '<div class="loading">Fehler beim Laden: ' + (error?.message || '') + '</div>';
+    return;
+  }
+
+  rendern(data);
+}
+
+// ── Hilfsfunktionen ──────────────────────────────────────────
+function zaehl(data, feld, wert) {
+  return data.filter(r => {
+    const v = r[feld];
+    if (Array.isArray(v)) return v.includes(wert);
+    return v === wert;
+  }).length;
+}
+
+function balken(data, feld, optionen, farbe) {
+  const max = Math.max(...optionen.map(o => zaehl(data, feld, o)), 1);
+  return optionen.map(o => {
+    const n = zaehl(data, feld, o);
+    const pct = Math.round((n / max) * 100);
+    return `<div class="bar-row">
+      <div class="bar-label" title="${o}">${o}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${farbe}"></div>
+      </div>
+      <div class="bar-count">${n}</div>
+    </div>`;
+  }).join('');
+}
+
+function freitexte(data, feld, farbe='var(--teal)') {
+  const antworten = data
+    .map(r => r[feld])
+    .filter(v => v && v.trim().length > 0);
+  if (antworten.length === 0)
+    return '<div class="freitext-empty">Keine Antworten eingegangen.</div>';
+  return '<div class="freitext-list">' +
+    antworten.map(a =>
+      `<div class="freitext-item" style="border-left-color:${farbe}">${a}</div>`
+    ).join('') +
+  '</div>';
+}
+
+function fragenBlock(nr, titel, inhalt, farbe='#1D9E75') {
+  return `<div class="frage-block">
+    <div class="frage-head">
+      <div class="frage-nr" style="background:${farbe}">F${nr}</div>
+      <div class="frage-title">${titel}</div>
+    </div>
+    <div class="frage-body">${inhalt}</div>
+  </div>`;
+}
+
+// ── Haupt-Rendering ──────────────────────────────────────────
+function rendern(data) {
+  const n = data.length;
+  const mitEmail = data.filter(r => r.email_opt && r.email_opt.trim()).length;
+  const heute = new Date().toLocaleDateString('de-DE',
+    { day:'2-digit', month:'2-digit', year:'numeric',
+      hour:'2-digit', minute:'2-digit' });
+
+  // Apps die genannt wurden
+  const appNamen = data
+    .map(r => r.app_name)
+    .filter(v => v && v.trim().length > 0);
+
+  let html = '';
+
+  // Stat-Karten
+  html += `<div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Teilnehmer gesamt</div>
+      <div class="stat-value teal">${n}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Mit E-Mail (wollen Ergebnis)</div>
+      <div class="stat-value orange">${mitEmail}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Stand</div>
+      <div class="stat-value" style="font-size:16px;margin-top:6px">${heute}</div>
+    </div>
+  </div>`;
+
+  // A: Verein
+  html += '<div class="section-label">A · Euer Verein</div>';
+
+  html += fragenBlock(1,
+    'In welchen Bereichen habt ihr Mannschaften im aktiven Spielbetrieb?',
+    balken(data, 'abteilungen', [
+      'Erwachsene / Herren','Damen','Jugend (Jungen)',
+      'Jugend (Mädchen)','Senioren'
+    ], 'var(--blue, #2563EB)'),
+    '#2563EB'
+  );
+
+  html += fragenBlock(2,
+    'Wie viele Mannschaften habt ihr insgesamt?',
+    balken(data, 'anzahl_mannschaften', [
+      '1–2','3–5','6–9','10+'
+    ], 'var(--orange)'),
+    'var(--orange)'
+  );
+
+  // B: Organisation
+  html += '<div class="section-label">B · Interne Organisation</div>';
+
+  html += fragenBlock(3,
+    'Was kostet am meisten Zeit und Nerven? (max. 4)',
+    balken(data, 'zeitfresser', [
+      'Verfügbarkeiten abfragen',
+      'Kurzfristige Ausfälle',
+      'Spielverschiebungen',
+      'Kommunikation SBL/MF',
+      'Kommunikation Spieler',
+      'Aufstellungen planen',
+      'Saisonplanung',
+      'Hallenzeiten/Training',
+      'Jugendkoordination',
+    ], 'var(--teal)'),
+    'var(--teal)'
+  );
+
+  html += fragenBlock(4,
+    'Kommunikationskanäle im Spielbetrieb',
+    balken(data, 'kommunikation', [
+      'WhatsApp','Telefon/SMS','E-Mail','Aushang','Vereinseigene App'
+    ], 'var(--teal)') +
+    (appNamen.length > 0
+      ? `<div style="margin-top:12px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Genannte Apps / Plattformen</div><div class="freitext-list">${appNamen.map(a=>'<div class="freitext-item" style="border-left-color:var(--orange)">'+a+'</div>').join('')}</div></div>`
+      : ''),
+    'var(--teal)'
+  );
+
+  html += fragenBlock(5,
+    'Was läuft über WhatsApp, obwohl es strukturierter sein sollte?',
+    freitexte(data, 'whatsapp_freitext'),
+    'var(--teal)'
+  );
+
+  // C: TT-Systeme
+  html += '<div class="section-label">C · click-tt und mytischtennis.de</div>';
+
+  html += fragenBlock(6,
+    'Erlebnis mit mytischtennis.de an Spieltagen',
+    balken(data, 'mytischtennis_erlebnis', [
+      'Problemlos','Manchmal langsam',
+      'Regelmäßig Probleme','Schauen nicht rein'
+    ], 'var(--purple)'),
+    'var(--purple)'
+  );
+
+  html += fragenBlock(7,
+    'Wunsch an click-tt / mytischtennis.de',
+    freitexte(data, 'tt_wunsch', 'var(--purple)'),
+    'var(--purple)'
+  );
+
+  // D: Die eine Frage
+  html += '<div class="section-label">D · Die eine Frage</div>';
+
+  html += fragenBlock(8,
+    'Wenn du eine Sache lösen könntest – was wäre das?',
+    freitexte(data, 'eine_sache', 'var(--orange)'),
+    'var(--orange)'
+  );
+
+  // E-Mail-Liste
+  const emails = data.filter(r => r.email_opt && r.email_opt.trim());
+  if (emails.length > 0) {
+    html += '<div class="section-label">E-Mail-Liste · Wollen Ergebnis erhalten</div>';
+    html += `<div class="frage-block">
+      <div class="frage-body">
+        <div class="freitext-list">
+          ${emails.map(r => '<div class="email-item">' + r.email_opt + '</div>').join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('inhalt').innerHTML = html;
+}
+</script>
+</body>
+</html>
